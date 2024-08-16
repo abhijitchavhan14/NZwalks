@@ -1,4 +1,5 @@
 using ASP.NET_Core_Web_API__1.Data;
+using ASP.NET_Core_Web_API__1.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 
@@ -15,6 +16,10 @@ builder.Services.AddDbContext<WebAPI1DbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("WebAPI1"));
 });
+
+builder.Services.AddScoped<IRegionRepository, RegionRepository>();
+
+builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
 var app = builder.Build();
 
