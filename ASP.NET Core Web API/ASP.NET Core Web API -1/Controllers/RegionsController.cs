@@ -14,7 +14,7 @@ namespace ASP.NET_Core_Web_API__1.Controllers
         private readonly IRegionRepository regionRepository;
         private readonly IMapper mapper;
 
-        public RegionsController(IRegionRepository regionRepository , IMapper mapper)
+        public RegionsController(IRegionRepository regionRepository, IMapper mapper)
         {
 
             this.regionRepository = regionRepository;
@@ -22,9 +22,9 @@ namespace ASP.NET_Core_Web_API__1.Controllers
         }
 
         [HttpGet]
-        
 
-       
+
+
 
         public async Task<IActionResult> GetAllRegions()
         {
@@ -58,63 +58,120 @@ namespace ASP.NET_Core_Web_API__1.Controllers
 
         }
 
+        [HttpGet]
+        [Route("{id:guid}")]
+        [ActionName("GetRegionAsync")]
+
+        public async Task<IActionResult> GetRegionAsync(Guid id)
+        {
+            var region = await regionRepository.GetAsync(id);
+
+            if (region == null)
+            {
+                return NotFound();
+            }
+
+            var regionDTO = mapper.Map<Models.DTO.Region>(region);
+
+            return Ok(regionDTO);
+        }
+
+
+  
+
+        [HttpPost]
+        public async Task<IActionResult> AddRegionAsync(Models.DTO.AddRegionRequest addRegionRequest)
+        {
+            //request to Domain models
+
+            var region = new Models.Domain.Region()
+            {
+                Code = addRegionRequest.Code,
+                Area = addRegionRequest.Area,
+                Name = addRegionRequest.Name,
+                Lat = addRegionRequest.Lat,
+                Long = addRegionRequest.Long,
+                Population = addRegionRequest.Population,
+            };
+
+            //pass details to Repository
+
+           region = await regionRepository.AddAsync(region);
+
+
+            //Region to DTO
+
+            var regionDTO = mapper.Map<Models.DTO.Region>(region);
+            //var regionDTO = new Models.DTO.Region
+            //{
+            //    Id = region.Id,
+            //    Code = region.Code,
+            //    Area = region.Area, 
+            //    Name = region.Name,
+            //    Lat = region.Lat,
+            //    Long = region.Long,
+            //    Population = region.Population,
+
+
+            //};
+
+            return CreatedAtAction(nameof(GetRegionAsync), new { id = regionDTO.Id},regionDTO);
+
+
+        }
+
+        [HttpDelete]
+        [Route("{id:guid}")]
+
+        public async Task<IActionResult> DeleteRegionAsync(Guid id)
+        {
+            var region = await regionRepository.DeleteAsync(id);
+
+            if (region == null)
+            {
+                return NotFound();
+            }
+
+            var regionDTO = mapper.Map<Models.DTO.Region>(region);
+            return Ok(regionDTO);
 
 
 
 
+        }
+
+        [HttpPut]
+        [Route("{id:guid}")]
+        public async Task<IActionResult> UpdateRegionAsync(Guid id, Models.DTO.UpdateRegionRequest updateRegionRequest)
+        {
+            
+            var region = new Models.Domain.Region();
+            {
+                region.Code = updateRegionRequest.Code;
+                region.Area = updateRegionRequest.Area;
+                region.Name = updateRegionRequest.Name;
+                region.Lat = updateRegionRequest.Lat;
+                region.Long = updateRegionRequest.Long;
+                region.Population = updateRegionRequest.Population;
+            }
+
+            region = await regionRepository.UpdateAsync(id,region);
+
+            if (region == null)
+            {
+                return NotFound();
+
+            }
+            var regionDTO = mapper.Map<Models.DTO.Region>(region);
+            return Ok(regionDTO);
 
 
 
-
-        //var regions = new List<Region>()
-        //{
-        //    new Region
-        //    {
-        //        Id = Guid.NewGuid(),
-        //        Name = "Mumbai ",
-        //        Code ="MUM",
-        //        Area = 224455,
-        //        Lat = -5.4546,
-        //        Long = 45.54544,
-        //        Population = 40000000
-        //    },
-
-        //     new Region
-        //    {
-        //        Id = Guid.NewGuid(),
-        //        Name = "Banglore",
-        //        Code ="BANG",
-        //        Area = 224455,
-        //        Lat = -5.4546,
-        //        Long = 45.54544,
-        //        Population = 40000000
-        //    }
+        }
 
 
-        //};
-
-
-
-        //return View();
-
-        //public IActionResult Index()
-        //{
-        //    var region = new List<Region>();
-        //    {
-        //        new Region
-        //        {
-        //            Id = Guid.NewGuid(),
-        //            Name = "Mumbai ",
-        //            Code = "MUM",
-        //            Area = 224455
-        //        };
-        //    }
-        //    return Ok(region);
-        //}
-
-        //public IActionResult Index()
-        //{
-        //    return View();
-        //}
     }
+
+
 }
+
